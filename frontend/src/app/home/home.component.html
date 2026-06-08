@@ -1,0 +1,270 @@
+<div class="min-h-screen bg-white">
+
+  <!-- NAVBAR -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l9-4 9 4v2H3V6zm0 4h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V10zm6 4h6"/>
+          </svg>
+        </div>
+        <span class="text-xl font-bold text-gray-900">SecureBank</span>
+      </div>
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
+        <a href="#features" class="hover:text-blue-600 transition">Features</a>
+        <a href="#stats" class="hover:text-blue-600 transition">About</a>
+        <a href="#why" class="hover:text-blue-600 transition">Why Us</a>
+      </div>
+      <div class="flex items-center gap-3">
+        <a routerLink="/login"
+          class="text-sm font-semibold text-gray-700 hover:text-blue-600 px-4 py-2 rounded-xl hover:bg-blue-50 transition">
+          Log In
+        </a>
+        <a routerLink="/signup"
+          class="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-xl transition shadow-sm">
+          Sign Up Free
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="pt-32 pb-20 px-6 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div class="max-w-6xl mx-auto text-center">
+      <span class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-6">
+        <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+        Trusted by 2 million+ customers worldwide
+      </span>
+      <h1 class="text-5xl md:text-7xl font-extrabold text-gray-900 leading-tight tracking-tight mb-6">
+        Banking Made<br/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+          Simple & Secure
+        </span>
+      </h1>
+      <p class="text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+        Open your account in minutes. Send money instantly, track your spending, and grow your savings — all in one beautiful app.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a routerLink="/signup"
+          class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-2xl text-lg transition shadow-lg shadow-blue-200">
+          Get Started — It's Free
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        </a>
+        <a routerLink="/login"
+          class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-800 font-bold px-8 py-4 rounded-2xl text-lg border border-gray-200 transition">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+          </svg>
+          Log In to Account
+        </a>
+      </div>
+      <!-- Trust badges -->
+      <div class="flex flex-wrap items-center justify-center gap-6 mt-10 text-sm text-gray-400 font-medium">
+        <span class="flex items-center gap-1.5">✅ No monthly fees</span>
+        <span class="flex items-center gap-1.5">✅ FDIC insured</span>
+        <span class="flex items-center gap-1.5">✅ 256-bit encryption</span>
+        <span class="flex items-center gap-1.5">✅ Cancel anytime</span>
+      </div>
+    </div>
+
+    <!-- Dashboard Preview -->
+    <div class="max-w-4xl mx-auto mt-16 relative">
+      <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+        <!-- Fake browser bar -->
+        <div class="bg-gray-50 border-b border-gray-100 px-4 py-3 flex items-center gap-2">
+          <div class="w-3 h-3 rounded-full bg-red-400"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+          <div class="w-3 h-3 rounded-full bg-green-400"></div>
+          <div class="flex-1 mx-4 bg-white border border-gray-200 rounded-lg px-3 py-1 text-xs text-gray-400 text-center">
+            app.securebank.com/dashboard
+          </div>
+        </div>
+        <!-- Mock dashboard content -->
+        <div class="p-6 bg-gray-50">
+          <div class="grid grid-cols-4 gap-3 mb-4">
+            <div class="col-span-1 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 text-white">
+              <p class="text-blue-200 text-xs">Total Balance</p>
+              <p class="text-xl font-bold mt-1">$24,521</p>
+              <p class="text-blue-200 text-xs mt-1">+2.5% ↑</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm">
+              <p class="text-gray-400 text-xs">Income</p>
+              <p class="text-lg font-bold text-gray-800 mt-1">$8,350</p>
+              <p class="text-green-500 text-xs mt-1">+12% ↑</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm">
+              <p class="text-gray-400 text-xs">Expenses</p>
+              <p class="text-lg font-bold text-gray-800 mt-1">$3,240</p>
+              <p class="text-red-400 text-xs mt-1">+5% ↑</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm">
+              <p class="text-gray-400 text-xs">Savings</p>
+              <p class="text-lg font-bold text-gray-800 mt-1">$5,110</p>
+              <p class="text-green-500 text-xs mt-1">+18% ↑</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div class="col-span-2 bg-white rounded-2xl p-4 shadow-sm">
+              <p class="text-sm font-semibold text-gray-800 mb-3">Recent Transactions</p>
+              <div class="space-y-2">
+                <div class="flex items-center gap-3 py-1">
+                  <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-sm">🎬</div>
+                  <div class="flex-1"><p class="text-xs font-medium text-gray-700">Netflix</p><p class="text-xs text-gray-400">Today</p></div>
+                  <span class="text-xs font-semibold text-gray-700">-$15.99</span>
+                </div>
+                <div class="flex items-center gap-3 py-1">
+                  <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-sm">💼</div>
+                  <div class="flex-1"><p class="text-xs font-medium text-gray-700">Salary</p><p class="text-xs text-gray-400">Yesterday</p></div>
+                  <span class="text-xs font-semibold text-green-600">+$4,200</span>
+                </div>
+                <div class="flex items-center gap-3 py-1">
+                  <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center text-sm">🛒</div>
+                  <div class="flex-1"><p class="text-xs font-medium text-gray-700">Amazon</p><p class="text-xs text-gray-400">May 26</p></div>
+                  <span class="text-xs font-semibold text-gray-700">-$89.50</span>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm">
+              <p class="text-sm font-semibold text-gray-800 mb-3">Quick Actions</p>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="bg-blue-50 rounded-xl p-2 text-center"><p class="text-lg">↗️</p><p class="text-xs text-gray-600 mt-1">Transfer</p></div>
+                <div class="bg-green-50 rounded-xl p-2 text-center"><p class="text-lg">➕</p><p class="text-xs text-gray-600 mt-1">Top Up</p></div>
+                <div class="bg-purple-50 rounded-xl p-2 text-center"><p class="text-lg">📋</p><p class="text-xs text-gray-600 mt-1">Pay Bill</p></div>
+                <div class="bg-orange-50 rounded-xl p-2 text-center"><p class="text-lg">📊</p><p class="text-xs text-gray-600 mt-1">Analytics</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section id="stats" class="py-16 bg-blue-600">
+    <div class="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div *ngFor="let stat of stats">
+        <p class="text-4xl font-extrabold text-white">{{ stat.value }}</p>
+        <p class="text-blue-200 text-sm font-medium mt-1">{{ stat.label }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="py-24 px-6 bg-white">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-extrabold text-gray-900 mb-4">Everything you need to manage money</h2>
+        <p class="text-gray-500 text-lg max-w-xl mx-auto">Powerful features built for modern banking, designed to simplify your financial life.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let f of features"
+          class="p-6 rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-50 transition group cursor-default">
+          <div class="w-12 h-12 bg-blue-50 group-hover:bg-blue-100 rounded-2xl flex items-center justify-center text-2xl mb-4 transition">
+            {{ f.icon }}
+          </div>
+          <h3 class="text-lg font-bold text-gray-800 mb-2">{{ f.title }}</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">{{ f.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY US -->
+  <section id="why" class="py-24 px-6 bg-gradient-to-br from-gray-50 to-blue-50">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+      <div>
+        <h2 class="text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
+          Why 2 million people<br/>choose SecureBank
+        </h2>
+        <div class="space-y-5">
+          <div class="flex gap-4">
+            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">✅</div>
+            <div>
+              <h4 class="font-bold text-gray-800">Open in 3 minutes</h4>
+              <p class="text-gray-500 text-sm mt-0.5">No paperwork, no branch visits. Just your phone and ID.</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">🔐</div>
+            <div>
+              <h4 class="font-bold text-gray-800">Zero fees, always</h4>
+              <p class="text-gray-500 text-sm mt-0.5">No monthly fees, no hidden charges. Your money stays yours.</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">📱</div>
+            <div>
+              <h4 class="font-bold text-gray-800">Everything in one app</h4>
+              <p class="text-gray-500 text-sm mt-0.5">Accounts, cards, transfers, analytics — one place for everything.</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">🤝</div>
+            <div>
+              <h4 class="font-bold text-gray-800">Real human support</h4>
+              <p class="text-gray-500 text-sm mt-0.5">Chat with a real person 24/7. No bots, no queues.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600">S</div>
+            <div><p class="font-semibold text-gray-800">Seang Ngorn</p><p class="text-xs text-gray-400">Premium Member ⭐⭐⭐⭐⭐</p></div>
+          </div>
+          <p class="text-gray-600 text-sm">"SecureBank changed how I manage money. Everything is so smooth and instant. I've recommended it to all my friends!"</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center font-bold text-green-600">J</div>
+            <div><p class="font-semibold text-gray-800">John Doe</p><p class="text-xs text-gray-400">Business Account ⭐⭐⭐⭐⭐</p></div>
+          </div>
+          <p class="text-gray-600 text-sm">"The analytics feature alone saved me thousands. I can see exactly where my money goes and set smart budgets automatically."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-24 px-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-center">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-4">Ready to take control<br/>of your finances?</h2>
+      <p class="text-blue-200 text-lg mb-10">Join 2 million+ people who trust SecureBank for their everyday banking.</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a routerLink="/signup"
+          class="w-full sm:w-auto inline-flex items-center justify-center bg-white hover:bg-gray-50 text-blue-700 font-bold px-8 py-4 rounded-2xl text-lg transition shadow-xl">
+          Create Free Account →
+        </a>
+        <a routerLink="/login"
+          class="w-full sm:w-auto inline-flex items-center justify-center border-2 border-white/40 hover:border-white text-white font-bold px-8 py-4 rounded-2xl text-lg transition">
+          I already have an account
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-900 text-gray-400 py-12 px-6">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l9-4 9 4v2H3V6zm0 4h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V10zm6 4h6"/>
+          </svg>
+        </div>
+        <span class="text-white font-bold">SecureBank</span>
+      </div>
+      <p class="text-sm">© 2026 SecureBank. All rights reserved. FDIC Insured. Equal Housing Lender.</p>
+      <div class="flex gap-6 text-sm">
+        <a href="#" class="hover:text-white transition">Privacy</a>
+        <a href="#" class="hover:text-white transition">Terms</a>
+        <a href="#" class="hover:text-white transition">Security</a>
+      </div>
+    </div>
+  </footer>
+
+</div>

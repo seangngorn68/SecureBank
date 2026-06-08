@@ -1,0 +1,233 @@
+<div class="space-y-6 max-w-3xl">
+
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-bold text-gray-800">My Profile</h1>
+    <p class="text-gray-500 mt-1">Manage your account information and settings</p>
+  </div>
+
+  <!-- Profile Card -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+    <div class="flex items-center gap-6">
+      <!-- Avatar -->
+      <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+        <span class="text-white text-3xl font-bold">{{ initials }}</span>
+      </div>
+      <div class="flex-1">
+        <h2 class="text-2xl font-bold text-gray-800">{{ displayName }}</h2>
+        <p class="text-gray-500 mt-1">{{ user?.email || 'No email set' }}</p>
+        <div class="flex items-center gap-2 mt-2">
+          <span class="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">✓ Verified</span>
+          <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">Premium Member</span>
+        </div>
+      </div>
+      <a [href]="keycloakProfileUrl" target="_blank"
+        class="flex-shrink-0 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium text-sm rounded-xl transition">
+        Edit Profile ↗
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="grid grid-cols-3 gap-4">
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <p class="text-3xl font-bold text-blue-600">{{ accountCount }}</p>
+      <p class="text-sm text-gray-500 mt-1">Accounts</p>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <p class="text-2xl font-bold text-gray-800">{{ fmt(totalBalance) }}</p>
+      <p class="text-sm text-gray-500 mt-1">Total Balance</p>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <p class="text-3xl font-bold text-purple-600">{{ transactionCount }}</p>
+      <p class="text-sm text-gray-500 mt-1">Transactions</p>
+    </div>
+  </div>
+
+  <!-- Account Info -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h3 class="font-semibold text-gray-800">Account Information</h3>
+    </div>
+    <div class="divide-y divide-gray-50">
+      <div class="px-6 py-4 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Username</p>
+          <p class="text-gray-800 font-semibold mt-0.5">{{ user?.username || '—' }}</p>
+        </div>
+        <span class="text-gray-300">🔒 Read-only</span>
+      </div>
+      <div class="px-6 py-4 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Email Address</p>
+          <p class="text-gray-800 font-semibold mt-0.5">{{ user?.email || 'Not set' }}</p>
+        </div>
+      </div>
+      <div class="px-6 py-4 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">User ID</p>
+          <p class="text-gray-400 text-xs font-mono mt-0.5">{{ user?.userId || '—' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Telegram Notifications ────────────────────────── -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">📱</span>
+        <h3 class="font-semibold text-gray-800">Telegram Notifications</h3>
+      </div>
+      <span *ngIf="telegramStatus.connected"
+        class="text-xs bg-green-100 text-green-700 font-semibold px-3 py-1 rounded-full">
+        ✅ Connected
+      </span>
+      <span *ngIf="!telegramStatus.connected"
+        class="text-xs bg-gray-100 text-gray-500 font-medium px-3 py-1 rounded-full">
+        Not connected
+      </span>
+    </div>
+
+    <!-- Connected State -->
+    <div *ngIf="telegramStatus.connected" class="px-6 py-5">
+      <div class="flex items-center gap-4 p-4 bg-green-50 rounded-2xl mb-4">
+        <div class="w-12 h-12 bg-[#229ED9] rounded-xl flex items-center justify-center text-2xl flex-shrink-0">
+          ✈️
+        </div>
+        <div class="flex-1">
+          <p class="font-semibold text-gray-800">{{ telegramStatus.username || 'Connected' }}</p>
+          <p class="text-xs text-gray-500 mt-0.5">Receiving all SecureBank notifications</p>
+        </div>
+      </div>
+
+      <!-- What you'll receive -->
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <div class="flex items-center gap-2 text-xs text-gray-600">
+          <span>💸</span> Transfer alerts
+        </div>
+        <div class="flex items-center gap-2 text-xs text-gray-600">
+          <span>💳</span> Deposit confirmations
+        </div>
+        <div class="flex items-center gap-2 text-xs text-gray-600">
+          <span>🔒</span> Security alerts
+        </div>
+        <div class="flex items-center gap-2 text-xs text-gray-600">
+          <span>🏦</span> Account updates
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button (click)="sendTestMessage()"
+          class="flex-1 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium text-sm transition">
+          {{ telegramTestSent ? '✅ Sent!' : '🧪 Send Test' }}
+        </button>
+        <button (click)="disconnectTelegram()" [disabled]="telegramDisconnecting"
+          class="flex-1 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-medium text-sm transition disabled:opacity-50">
+          {{ telegramDisconnecting ? 'Disconnecting...' : '🔌 Disconnect' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Not Connected + Linking State -->
+    <div *ngIf="!telegramStatus.connected" class="px-6 py-5">
+
+      <!-- Linking in progress -->
+      <div *ngIf="telegramLinking" class="text-center py-4">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-3xl mx-auto mb-3">✈️</div>
+        <p class="font-semibold text-gray-800 mb-1">Waiting for Telegram...</p>
+        <p class="text-sm text-gray-500 mb-4">
+          Open Telegram → Start the bot → Come back here
+        </p>
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <span class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></span>
+          <span class="text-sm text-gray-400">Polling... expires in {{ linkCountdownDisplay }}s</span>
+        </div>
+        <button (click)="cancelConnect()"
+          class="px-6 py-2 border border-gray-200 text-gray-600 rounded-xl text-sm hover:bg-gray-50 transition">
+          Cancel
+        </button>
+      </div>
+
+      <!-- Not connected yet -->
+      <div *ngIf="!telegramLinking">
+        <p class="text-sm text-gray-500 mb-4">
+          Connect Telegram to receive real-time notifications on your phone.
+        </p>
+
+        <!-- Steps -->
+        <div class="space-y-3 mb-5">
+          <div class="flex items-start gap-3">
+            <div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</div>
+            <p class="text-sm text-gray-600">Click the button below</p>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</div>
+            <p class="text-sm text-gray-600">Telegram opens — click <strong>START</strong></p>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</div>
+            <p class="text-sm text-gray-600">Come back here — connected automatically! ✅</p>
+          </div>
+        </div>
+
+        <button (click)="connectTelegram()"
+          class="w-full py-3.5 rounded-2xl bg-[#229ED9] hover:bg-[#1a8abf] text-white font-bold text-base transition flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+          </svg>
+          Connect via Telegram
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h3 class="font-semibold text-gray-800">Security</h3>
+    </div>
+    <div class="divide-y divide-gray-50">
+      <div class="px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-orange-100 rounded-xl flex items-center justify-center">🔑</div>
+          <div>
+            <p class="text-sm font-medium text-gray-800">Change Password</p>
+            <p class="text-xs text-gray-400 mt-0.5">Update your Keycloak password</p>
+          </div>
+        </div>
+        <a [href]="keycloakProfileUrl" target="_blank"
+          class="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-xl transition">
+          Change →
+        </a>
+      </div>
+      <div class="px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-green-100 rounded-xl flex items-center justify-center">🔐</div>
+          <div>
+            <p class="text-sm font-medium text-gray-800">Two-Factor Authentication</p>
+            <p class="text-xs text-gray-400 mt-0.5">Add an extra layer of security</p>
+          </div>
+        </div>
+        <a [href]="keycloakProfileUrl" target="_blank"
+          class="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-xl transition">
+          Setup →
+        </a>
+      </div>
+      <div class="px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center">📋</div>
+          <div>
+            <p class="text-sm font-medium text-gray-800">Active Sessions</p>
+            <p class="text-xs text-gray-400 mt-0.5">View and manage your login sessions</p>
+          </div>
+        </div>
+        <a [href]="keycloakProfileUrl" target="_blank"
+          class="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-xl transition">
+          View →
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>

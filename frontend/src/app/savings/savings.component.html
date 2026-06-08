@@ -1,0 +1,190 @@
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Savings Goals</h1>
+      <p class="text-gray-500 mt-1">Track your financial targets and save smarter</p>
+    </div>
+    <button (click)="showAdd = true"
+      class="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition text-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      New Goal
+    </button>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="goals.length === 0" class="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
+    <div class="text-6xl mb-4">🎯</div>
+    <h3 class="text-xl font-semibold text-gray-700">No savings goals yet</h3>
+    <p class="text-gray-400 mt-2 mb-6">Create your first goal and start saving toward what matters most.</p>
+    <button (click)="showAdd = true"
+      class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition">
+      Create First Goal
+    </button>
+  </div>
+
+  <!-- Goals grid -->
+  <div *ngIf="goals.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+    <div *ngFor="let goal of goals"
+      class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+
+      <!-- Card header gradient -->
+      <div [class]="'bg-gradient-to-br ' + goal.color + ' p-5 text-white'">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl">
+              {{ goal.icon }}
+            </div>
+            <div>
+              <h3 class="font-bold text-lg leading-tight">{{ goal.name }}</h3>
+              <p class="text-white/70 text-xs mt-0.5" *ngIf="daysLeft(goal.deadline) !== null">
+                {{ daysLeft(goal.deadline) === 0 ? '⚠️ Due today' : daysLeft(goal.deadline) + ' days left' }}
+              </p>
+            </div>
+          </div>
+          <button (click)="deleteGoal(goal.id)" class="w-7 h-7 bg-white/20 hover:bg-white/40 rounded-lg flex items-center justify-center transition text-xs">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Card body -->
+      <div class="p-5">
+        <!-- Progress bar -->
+        <div class="flex items-center justify-between text-sm mb-2">
+          <span class="font-semibold text-gray-800">{{ fmt(goal.saved) }}</span>
+          <span class="text-gray-400">of {{ fmt(goal.target) }}</span>
+        </div>
+        <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div [class]="'h-full rounded-full bg-gradient-to-r transition-all duration-500 ' + goal.color"
+            [style.width.%]="progress(goal)"></div>
+        </div>
+        <div class="flex items-center justify-between mt-2">
+          <span class="text-xs text-gray-400">{{ progress(goal) | number:'1.0-0' }}% complete</span>
+          <span [class]="'text-xs font-medium ' + (remaining(goal) === 0 ? 'text-green-600' : 'text-gray-500')">
+            {{ remaining(goal) === 0 ? '🎉 Goal reached!' : fmt(remaining(goal)) + ' to go' }}
+          </span>
+        </div>
+
+        <!-- Deposit button -->
+        <div *ngIf="depositGoalId !== goal.id" class="mt-4">
+          <button (click)="openDeposit(goal.id)" [disabled]="remaining(goal) === 0"
+            class="w-full py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium text-sm transition disabled:opacity-40 disabled:cursor-not-allowed">
+            + Add Money
+          </button>
+        </div>
+
+        <!-- Inline deposit form -->
+        <div *ngIf="depositGoalId === goal.id" class="mt-4 space-y-3">
+          <div class="relative">
+            <span class="absolute left-3 top-3 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="depositAmount" min="0.01" placeholder="0.00" autofocus
+              class="w-full pl-7 pr-3 py-2.5 rounded-xl border-2 border-blue-300 focus:border-blue-500 focus:outline-none text-sm"/>
+          </div>
+          <p *ngIf="depositError" class="text-xs text-red-500">{{ depositError }}</p>
+          <div class="flex gap-2">
+            <button (click)="confirmDeposit()"
+              class="flex-1 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+              Confirm
+            </button>
+            <button (click)="depositGoalId = null"
+              class="flex-1 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Goal Modal -->
+<div *ngIf="showAdd" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="showAdd = false"></div>
+  <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md z-10 overflow-hidden">
+
+    <div class="bg-gradient-to-br from-blue-600 to-blue-800 px-6 pt-6 pb-5 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold">New Savings Goal</h2>
+          <p class="text-blue-200 text-sm mt-0.5">Set a target and start saving</p>
+        </div>
+        <button (click)="showAdd = false" class="w-9 h-9 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+
+      <!-- Goal name -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Goal Name</label>
+        <input type="text" [(ngModel)]="form.name" placeholder="e.g. New Car, Vacation..."
+          class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm transition"/>
+      </div>
+
+      <!-- Icon picker -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Icon</label>
+        <div class="flex flex-wrap gap-2">
+          <button *ngFor="let icon of icons" (click)="form.icon = icon"
+            [class]="'w-10 h-10 rounded-xl text-xl flex items-center justify-center transition border-2 ' +
+              (form.icon === icon ? 'border-blue-500 bg-blue-50' : 'border-gray-100 hover:border-gray-300')">
+            {{ icon }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Color picker -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Color</label>
+        <div class="flex gap-2">
+          <button *ngFor="let c of colors" (click)="form.color = c.from + ' ' + c.to"
+            [class]="'w-8 h-8 rounded-full bg-gradient-to-br transition ring-offset-2 ' + c.from + ' ' + c.to +
+              (form.color === c.from + ' ' + c.to ? ' ring-2 ring-gray-400' : '')">
+          </button>
+        </div>
+      </div>
+
+      <!-- Target amount -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Target Amount</label>
+        <div class="relative">
+          <span class="absolute left-4 top-3.5 text-gray-400 text-sm">$</span>
+          <input type="number" [(ngModel)]="form.target" min="1" placeholder="0.00"
+            class="w-full pl-8 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm transition"/>
+        </div>
+      </div>
+
+      <!-- Starting amount -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Already Saved <span class="text-gray-400 font-normal">(optional)</span></label>
+        <div class="relative">
+          <span class="absolute left-4 top-3.5 text-gray-400 text-sm">$</span>
+          <input type="number" [(ngModel)]="form.saved" min="0" placeholder="0.00"
+            class="w-full pl-8 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm transition"/>
+        </div>
+      </div>
+
+      <!-- Deadline -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Deadline <span class="text-gray-400 font-normal">(optional)</span></label>
+        <input type="date" [(ngModel)]="form.deadline"
+          class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm transition"/>
+      </div>
+
+      <p *ngIf="formError" class="text-sm text-red-500">{{ formError }}</p>
+
+      <button (click)="addGoal()"
+        class="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition">
+        Create Goal
+      </button>
+    </div>
+  </div>
+</div>

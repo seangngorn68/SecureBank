@@ -1,0 +1,22 @@
+<div class="flex min-h-screen bg-gray-50">
+
+  <!-- Mobile overlay -->
+  <div *ngIf="sidebarOpen"
+    class="fixed inset-0 bg-black/40 z-40 lg:hidden"
+    (click)="sidebarOpen = false">
+  </div>
+
+  <!-- Sidebar (desktop: fixed, mobile: drawer) -->
+  <div [class]="'fixed top-0 left-0 h-full w-64 z-50 transition-transform duration-300 lg:translate-x-0 ' +
+    (sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0')">
+    <app-sidebar (closeSidebar)="sidebarOpen = false"></app-sidebar>
+  </div>
+
+  <!-- Main content -->
+  <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
+    <app-header (toggleSidebar)="sidebarOpen = !sidebarOpen"></app-header>
+    <main class="flex-1 p-4 md:p-6">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

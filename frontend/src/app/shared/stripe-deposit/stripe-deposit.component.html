@@ -1,0 +1,128 @@
+<div *ngIf="show" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="close.emit()"></div>
+
+  <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md z-10 overflow-hidden">
+
+    <!-- Header -->
+    <div class="bg-gradient-to-br from-indigo-600 to-purple-700 px-6 pt-6 pb-6 text-white">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-xl">💳</div>
+          <div>
+            <h2 class="text-xl font-bold">Deposit via Card</h2>
+            <p class="text-indigo-200 text-xs mt-0.5">Powered by Stripe</p>
+          </div>
+        </div>
+        <button (click)="close.emit()" class="w-9 h-9 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="flex items-center gap-2 mt-1">
+        <span class="text-xs text-indigo-200">Accepted:</span>
+        <span *ngFor="let c of ['VISA','MC','AMEX']"
+          class="text-xs bg-white/20 px-2 py-0.5 rounded font-bold text-white">
+          {{ c }}
+        </span>
+      </div>
+    </div>
+
+    <div class="p-6">
+
+      <!-- ── FORM — always in DOM, hidden with CSS not *ngIf ── -->
+      <!-- KEY FIX: [hidden] keeps #cardElement in DOM so Stripe can always access it -->
+      <div [hidden]="step !== 'form'">
+
+        <div class="mb-5 p-3 bg-blue-50 border border-blue-100 rounded-xl text-xs text-blue-700">
+          🧪 <strong>Test Card:</strong> 4242 4242 4242 4242 · Any future date · Any CVC
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Deposit to</label>
+          <select [(ngModel)]="selectedAccountId"
+            class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:outline-none text-sm bg-white transition">
+            <option [value]="0" disabled>Select account</option>
+            <option *ngFor="let a of accounts" [value]="a.id">
+              {{ a.name }} — ${{ a.balance }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Amount (USD)</label>
+          <div class="relative">
+            <span class="absolute left-4 top-3.5 text-gray-400 font-bold">$</span>
+            <input type="number" [(ngModel)]="amount" min="1"
+              class="w-full pl-8 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:outline-none text-sm transition"
+              placeholder="0.00"/>
+          </div>
+          <div class="flex gap-2 mt-2">
+            <button *ngFor="let q of [10, 25, 50, 100, 200]" (click)="amount = q"
+              [class]="'flex-1 py-1.5 text-xs font-semibold rounded-lg border transition ' +
+                (amount === q ? 'border-indigo-500 bg-indigo-50 text-indigo-600' : 'border-gray-200 text-gray-500 hover:border-indigo-300')">
+              ${{ q }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Stripe Card Element — ALWAYS in DOM -->
+        <div class="mb-5">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Card Details
+            <span *ngIf="!cardReady" class="text-xs text-gray-400 font-normal ml-2">⏳ Loading card...</span>
+            <span *ngIf="cardReady" class="text-xs text-green-500 font-normal ml-2">✓ Ready</span>
+          </label>
+          <div [class]="'p-4 border-2 rounded-xl bg-white transition min-h-[52px] ' + (cardReady ? 'border-indigo-400' : 'border-gray-200')">
+            <!-- Stripe mounts here — never removed from DOM -->
+            <div #cardElement id="stripe-card-element"></div>
+          </div>
+        </div>
+
+        <div *ngIf="errorMsg" class="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl">
+          ⚠️ {{ errorMsg }}
+        </div>
+
+        <button (click)="pay()" [disabled]="!amount || amount < 1 || !selectedAccountId || !cardReady || isPaying"
+          class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-40 text-white font-bold text-lg transition shadow-lg shadow-indigo-200 flex items-center justify-center gap-2">
+          <svg *ngIf="!isPaying" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <span *ngIf="isPaying" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          {{ isPaying ? 'Processing...' : 'Pay ' + (amount ? fmt(amount) : '$0.00') + ' Securely' }}
+        </button>
+
+        <p class="text-center text-xs text-gray-400 mt-3">
+          🔒 Secured by Stripe · PCI DSS Compliant
+        </p>
+      </div>
+
+      <!-- ── SUCCESS ── -->
+      <div *ngIf="step === 'success'" class="py-6 text-center">
+        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">✅</div>
+        <h3 class="text-2xl font-bold text-gray-800">Payment Successful!</h3>
+        <p class="text-gray-500 mt-2">
+          <span class="text-2xl font-bold text-green-600">{{ fmt(successAmount) }}</span>
+          deposited to your account
+        </p>
+        <p class="text-xs text-gray-400 mt-2">via Stripe · {{ accountName(selectedAccountId) }}</p>
+        <button (click)="close.emit(); reset()"
+          class="mt-6 w-full py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold transition">
+          Done ✓
+        </button>
+      </div>
+
+      <!-- ── ERROR ── -->
+      <div *ngIf="step === 'error'" class="py-6 text-center">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">❌</div>
+        <h3 class="text-xl font-bold text-gray-800">Payment Failed</h3>
+        <p class="text-red-500 text-sm mt-2 px-4">{{ errorMsg }}</p>
+        <button (click)="step = 'form'; errorMsg = ''"
+          class="mt-6 w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition">
+          Try Again
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

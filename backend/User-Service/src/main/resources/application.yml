@@ -1,0 +1,45 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: user-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/employee
+    username: postgres
+    password: your_db_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8181/realms/microservices-realm
+
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
+
+# ===============================
+# KEYCLOAK ADMIN-CLI CONFIG
+# ===============================
+keycloak:
+  server-url: http://localhost:8181
+  realm: microservices-realm
+  admin:
+    username: your_keycloak_admin_username
+    password: your_keycloak_admin_password
+
+  client:
+    id: user-service        # Client ID ?? Keycloak
+    secret: your_keycloak_client_secret

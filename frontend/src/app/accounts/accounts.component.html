@@ -1,0 +1,367 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">My Accounts</h1>
+      <p class="text-gray-500 mt-1">Manage all your bank accounts</p>
+    </div>
+    <!-- Stripe Deposit Button -->
+    <button (click)="showStripeDeposit = true"
+      class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl transition shadow-lg shadow-indigo-200 text-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+      </svg>
+      💳 Deposit via Card
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center py-12 text-gray-400">Loading accounts...</div>
+  <div *ngIf="error" class="text-center py-12 text-red-500">{{ error }}</div>
+
+  <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div *ngFor="let account of accounts"
+      class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition cursor-pointer">
+      <div class="flex items-center justify-between mb-4">
+        <div [class]="'w-12 h-12 rounded-xl flex items-center justify-center ' + iconBgFor(account.type)">
+          <span class="text-2xl">{{ iconFor(account.type) }}</span>
+        </div>
+        <span [class]="'text-xs font-medium px-3 py-1 rounded-full ' + badgeFor(account.type)">{{ account.type }}</span>
+      </div>
+      <p class="text-gray-500 text-sm">{{ account.name }}</p>
+      <p class="text-2xl font-bold text-gray-800 mt-1">{{ fmt(account.balance) }}</p>
+      <p class="text-gray-400 text-sm mt-3">Acc No: {{ account.number }}</p>
+      <button (click)="openTopUp(account)"
+        class="mt-4 w-full py-2 text-sm font-medium bg-green-50 text-green-600 hover:bg-green-100 rounded-xl transition flex items-center justify-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Top Up
+      </button>
+    </div>
+
+    <!-- Add new account button -->
+    <button (click)="openModal()"
+      class="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 hover:border-blue-400 hover:bg-blue-50 transition group cursor-pointer">
+      <div class="w-12 h-12 rounded-xl bg-white border-2 border-dashed border-gray-300 group-hover:border-blue-400 flex items-center justify-center">
+        <svg class="w-6 h-6 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+      </div>
+      <span class="text-sm font-medium text-gray-500 group-hover:text-blue-600">Add New Account</span>
+    </button>
+  </div>
+
+  <!-- Account Summary Table -->
+  <div *ngIf="accounts.length > 0" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="text-lg font-semibold text-gray-800">Account Summary</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Account</th>
+            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Interest</th>
+            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr *ngFor="let account of accounts" class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-3">
+                <span class="text-xl">{{ iconFor(account.type) }}</span>
+                <div>
+                  <p class="font-medium text-gray-800">{{ account.name }}</p>
+                  <p class="text-sm text-gray-500">{{ account.number }}</p>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-600">{{ account.type }}</td>
+            <td class="px-6 py-4 font-semibold text-gray-800">{{ fmt(account.balance) }}</td>
+            <td class="px-6 py-4 text-sm text-green-600">{{ account.interestRate }}</td>
+            <td class="px-6 py-4">
+              <span class="bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-full">Active</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── SAVINGS GOALS ─────────────── -->
+<div class="space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-xl font-bold text-gray-800">🎯 Savings Goals</h2>
+      <p class="text-gray-400 text-sm mt-0.5">Track progress toward your financial targets</p>
+    </div>
+    <button (click)="openGoalModal()"
+      class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      New Goal
+    </button>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="goals.length === 0" class="bg-white rounded-2xl p-10 text-center border border-gray-100 shadow-sm">
+    <p class="text-4xl mb-3">🎯</p>
+    <p class="font-semibold text-gray-700">No savings goals yet</p>
+    <p class="text-gray-400 text-sm mt-1">Set a goal and track your savings progress!</p>
+  </div>
+
+  <!-- Goals Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div *ngFor="let g of goals" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 relative">
+      <!-- Delete -->
+      <button (click)="goalService.delete(g.id)"
+        class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full hover:bg-red-50 text-gray-300 hover:text-red-500 transition text-sm">
+        ✕
+      </button>
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+             [style.background]="g.color + '20'">
+          {{ g.icon }}
+        </div>
+        <div>
+          <p class="font-semibold text-gray-800">{{ g.name }}</p>
+          <p class="text-xs text-gray-400">{{ goalProgress(g) }}% of {{ fmt(g.target) }}</p>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="w-full bg-gray-100 rounded-full h-2 mb-2">
+        <div class="h-2 rounded-full transition-all" [style.width]="goalProgress(g) + '%'" [style.background]="g.color"></div>
+      </div>
+      <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+        <span>{{ fmt(g.saved) }} saved</span>
+        <span>{{ fmt(g.target - g.saved) }} to go</span>
+      </div>
+
+      <div *ngIf="g.deadline" class="text-xs text-gray-400 mb-3">📅 Target: {{ g.deadline | date:'MMM d, y' }}</div>
+
+      <button (click)="openDepositGoal(g.id)"
+        class="w-full py-2 text-sm font-medium rounded-xl transition"
+        [style.background]="g.color + '15'" [style.color]="g.color">
+        + Add Savings
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── ADD ACCOUNT MODAL ─────────────── -->
+<div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeModal()"></div>
+
+  <!-- Modal Card -->
+  <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 z-10">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">Add New Account</h2>
+        <p class="text-sm text-gray-500 mt-0.5">Fill in the details below</p>
+      </div>
+      <button (click)="closeModal()" class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Account Type Selector -->
+    <div class="mb-5">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Account Type</label>
+      <div class="grid grid-cols-3 gap-2">
+        <button *ngFor="let t of accountTypes" type="button"
+          (click)="newAccount.type = t.value; onTypeChange()"
+          [class]="'flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition ' +
+            (newAccount.type === t.value
+              ? 'border-blue-500 bg-blue-50'
+              : 'border-gray-200 hover:border-gray-300 bg-white')">
+          <span class="text-2xl">{{ t.icon }}</span>
+          <span [class]="'text-xs font-medium ' + (newAccount.type === t.value ? 'text-blue-700' : 'text-gray-600')">
+            {{ t.label }}
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Account Name -->
+    <div class="mb-5">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
+      <input type="text" [(ngModel)]="newAccount.name"
+        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm"
+        placeholder="e.g. My Savings Account"/>
+    </div>
+
+    <!-- Initial Balance -->
+    <div class="mb-5">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Initial Balance</label>
+      <div class="relative">
+        <span class="absolute left-4 top-3.5 text-gray-400 font-medium text-sm">$</span>
+        <input type="number" [(ngModel)]="newAccount.balance" min="0"
+          class="w-full pl-8 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm"
+          placeholder="0.00"/>
+      </div>
+    </div>
+
+    <!-- Interest Rate (auto-filled) -->
+    <div class="mb-6 p-4 bg-gray-50 rounded-xl flex items-center justify-between">
+      <span class="text-sm text-gray-600">Interest Rate</span>
+      <span class="text-sm font-semibold text-green-600">{{ interestFor(newAccount.type) }}</span>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="saveError" class="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl">{{ saveError }}</div>
+
+    <!-- Buttons -->
+    <div class="flex gap-3">
+      <button (click)="closeModal()"
+        class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition text-sm">
+        Cancel
+      </button>
+      <button (click)="saveAccount()" [disabled]="isSaving"
+        class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold transition text-sm">
+        {{ isSaving ? 'Creating...' : 'Create Account' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── TOP UP MODAL ─────────────── -->
+<div *ngIf="showTopUpModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeTopUp()"></div>
+  <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 z-10">
+
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">Top Up Account</h2>
+        <p class="text-sm text-gray-500 mt-0.5">{{ selectedAccountName() }}</p>
+      </div>
+      <button (click)="closeTopUp()" class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-400 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Amount -->
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Amount to Deposit</label>
+      <div class="relative">
+        <span class="absolute left-4 top-4 text-gray-400 font-semibold">$</span>
+        <input type="number" [(ngModel)]="topUpAmount" min="1"
+          class="w-full pl-8 pr-4 py-4 text-2xl font-bold rounded-xl border-2 border-gray-200 focus:outline-none focus:border-blue-500 transition"
+          placeholder="0.00"/>
+      </div>
+    </div>
+
+    <!-- Quick amounts -->
+    <div class="grid grid-cols-4 gap-2 mb-6">
+      <button *ngFor="let q of [50, 100, 500, 1000]" (click)="topUpAmount = q"
+        [class]="'py-2 text-sm font-medium rounded-xl border transition ' +
+          (topUpAmount === q ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 hover:border-blue-300 text-gray-600')">
+        ${{ q }}
+      </button>
+    </div>
+
+    <div *ngIf="topUpError" class="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl">{{ topUpError }}</div>
+
+    <div class="flex gap-3">
+      <button (click)="closeTopUp()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition text-sm">
+        Cancel
+      </button>
+      <button (click)="doTopUp()" [disabled]="isTopUpSaving || !topUpAmount || topUpAmount <= 0"
+        class="flex-1 py-3 rounded-xl bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white font-semibold transition text-sm">
+        {{ isTopUpSaving ? 'Processing...' : 'Deposit' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── NEW GOAL MODAL ─────────────── -->
+<div *ngIf="showGoalModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeGoalModal()"></div>
+  <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm p-7 z-10">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-xl font-bold text-gray-800">New Savings Goal</h2>
+      <button (click)="closeGoalModal()" class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-400 transition">✕</button>
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Icon</label>
+      <div class="flex flex-wrap gap-2">
+        <button *ngFor="let ic of goalIcons" (click)="newGoal.icon = ic"
+          [class]="'w-10 h-10 text-xl rounded-xl border-2 transition ' + (newGoal.icon === ic ? 'border-blue-500 bg-blue-50' : 'border-gray-200')">
+          {{ ic }}
+        </button>
+      </div>
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Goal Name</label>
+      <input type="text" [(ngModel)]="newGoal.name"
+        class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm"
+        placeholder="e.g. New Car, Vacation"/>
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Target Amount</label>
+      <div class="relative">
+        <span class="absolute left-4 top-3.5 text-gray-400 text-sm">$</span>
+        <input type="number" [(ngModel)]="newGoal.target" min="1"
+          class="w-full pl-8 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm"
+          placeholder="0.00"/>
+      </div>
+    </div>
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Target Date (optional)</label>
+      <input type="date" [(ngModel)]="newGoal.deadline"
+        class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm"/>
+    </div>
+    <div class="flex gap-3">
+      <button (click)="closeGoalModal()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition text-sm">Cancel</button>
+      <button (click)="addGoal()" [disabled]="!newGoal.name || !newGoal.target"
+        class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold transition text-sm">
+        Create Goal
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── DEPOSIT TO GOAL ─────────────── -->
+<div *ngIf="showDepositGoalModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="showDepositGoalModal = false"></div>
+  <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm p-7 z-10 text-center">
+    <h2 class="text-xl font-bold text-gray-800 mb-1">Add to "{{ goalName(depositGoalId) }}"</h2>
+    <p class="text-gray-400 text-sm mb-5">How much are you saving today?</p>
+    <div class="relative mb-4">
+      <span class="absolute left-4 top-3.5 text-gray-400 font-semibold">$</span>
+      <input type="number" [(ngModel)]="depositAmount" min="0"
+        class="w-full pl-8 pr-4 py-3 text-xl font-bold rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-center transition"/>
+    </div>
+    <div class="grid grid-cols-4 gap-2 mb-5">
+      <button *ngFor="let q of [10,25,50,100]" (click)="depositAmount = q"
+        [class]="'py-2 text-sm font-medium rounded-xl border transition ' + (depositAmount === q ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-500')">
+        ${{ q }}
+      </button>
+    </div>
+    <div class="flex gap-3">
+      <button (click)="showDepositGoalModal = false" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium text-sm">Cancel</button>
+      <button (click)="depositToGoal()" [disabled]="!depositAmount || depositAmount <= 0"
+        class="flex-1 py-3 rounded-xl bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white font-semibold transition text-sm">
+        Save 💰
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── STRIPE DEPOSIT MODAL ─── -->
+<app-stripe-deposit
+  [show]="showStripeDeposit"
+  (close)="showStripeDeposit = false; loadAccounts()"
+  (deposited)="showStripeDeposit = false; loadAccounts()">
+</app-stripe-deposit>

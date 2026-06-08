@@ -1,0 +1,169 @@
+<div *ngIf="show" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="close.emit()"></div>
+  <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm z-10 overflow-hidden">
+
+    <!-- Header -->
+    <div class="bg-gradient-to-br from-blue-600 to-blue-800 px-6 pt-6 pb-5 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold">Transfer Money</h2>
+          <p class="text-blue-200 text-sm mt-0.5">
+            {{ step === 1 ? 'Choose transfer type' : transferType === 'own' ? 'Between my accounts' : 'Send to someone' }}
+          </p>
+        </div>
+        <button (click)="close.emit()" class="w-9 h-9 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Step dots -->
+      <div class="flex gap-1.5 mt-4">
+        <div [class]="'h-1.5 rounded-full transition-all ' + (step >= 1 ? 'bg-white w-6' : 'bg-white/30 w-3')"></div>
+        <div [class]="'h-1.5 rounded-full transition-all ' + (step >= 2 ? 'bg-white w-6' : 'bg-white/30 w-3')"></div>
+        <div [class]="'h-1.5 rounded-full transition-all ' + (step >= 3 ? 'bg-white w-6' : 'bg-white/30 w-3')"></div>
+      </div>
+    </div>
+
+    <div class="p-6">
+
+      <!-- Step 1: Choose type -->
+      <div *ngIf="step === 1" class="space-y-3">
+        <button (click)="selectType('own')"
+          class="w-full flex items-center gap-4 p-4 rounded-2xl border-2 border-gray-100 hover:border-blue-400 hover:bg-blue-50 transition text-left group">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">🔄</div>
+          <div>
+            <p class="font-semibold text-gray-800">Between My Accounts</p>
+            <p class="text-xs text-gray-400 mt-0.5">Move funds between your own accounts</p>
+          </div>
+        </button>
+        <button (click)="selectType('external')"
+          class="w-full flex items-center gap-4 p-4 rounded-2xl border-2 border-gray-100 hover:border-blue-400 hover:bg-blue-50 transition text-left group">
+          <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">📤</div>
+          <div>
+            <p class="font-semibold text-gray-800">Send to Someone</p>
+            <p class="text-xs text-gray-400 mt-0.5">Transfer by account number or phone</p>
+          </div>
+        </button>
+      </div>
+
+      <!-- Step 2: Fill details -->
+      <div *ngIf="step === 2 && !success">
+        <button (click)="step = 1" class="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 mb-5 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Back
+        </button>
+
+        <!-- Own accounts transfer -->
+        <div *ngIf="transferType === 'own'" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">From Account</label>
+            <select [(ngModel)]="fromAccountId"
+              class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm bg-white transition">
+              <option [value]="0" disabled>Select account</option>
+              <option *ngFor="let a of accounts" [value]="a.id">
+                {{ a.name }} — {{ fmt(a.balance) }}
+              </option>
+            </select>
+          </div>
+
+          <div class="flex justify-center text-gray-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">To Account</label>
+            <select [(ngModel)]="toAccountId"
+              class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm bg-white transition">
+              <option [value]="0" disabled>Select account</option>
+              <option *ngFor="let a of accounts" [value]="a.id" [disabled]="a.id === fromAccountId">
+                {{ a.name }} — {{ fmt(a.balance) }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- External / send money -->
+        <div *ngIf="transferType === 'external'" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">From Account</label>
+            <select [(ngModel)]="fromAccountId"
+              class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm bg-white transition">
+              <option [value]="0" disabled>Select account</option>
+              <option *ngFor="let a of accounts" [value]="a.id">
+                {{ a.name }} — {{ fmt(a.balance) }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Recipient Account Number</label>
+            <input type="text" [(ngModel)]="recipientAccountNumber" placeholder="e.g. 1234-5678-9012"
+              class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm transition"/>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Recipient Name <span class="text-gray-400 font-normal">(optional)</span></label>
+            <input type="text" [(ngModel)]="recipientName" placeholder="e.g. John Doe"
+              class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm transition"/>
+          </div>
+        </div>
+
+        <!-- Amount (shared) -->
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+          <div class="relative">
+            <span class="absolute left-4 top-3.5 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="amount" min="0.01"
+              class="w-full pl-8 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm transition"
+              placeholder="0.00"/>
+          </div>
+          <div class="flex gap-2 mt-2">
+            <button *ngFor="let q of [10, 20, 50, 100]" (click)="amount = q"
+              [class]="'flex-1 py-1.5 text-xs font-medium rounded-lg border transition ' +
+                (amount === q ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-500 hover:border-blue-300')">
+              ${{ q }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Note (shared) -->
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Note <span class="text-gray-400 font-normal">(optional)</span></label>
+          <input type="text" [(ngModel)]="note" placeholder="e.g. Rent payment"
+            class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-sm transition"/>
+        </div>
+
+        <div *ngIf="error" class="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl">{{ error }}</div>
+
+        <button (click)="submit()" [disabled]="isSaving || !canSubmit()"
+          class="mt-5 w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold transition">
+          {{ isSaving ? 'Sending...' : 'Send ' + (amount ? fmt(amount) : '') }}
+        </button>
+      </div>
+
+      <!-- Step 3: Success -->
+      <div *ngIf="step === 3" class="text-center py-4">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">✅</div>
+        <h3 class="text-xl font-bold text-gray-800">Transfer Successful!</h3>
+        <p class="text-gray-500 text-sm mt-2">
+          {{ fmt(amount) }} sent
+          <span *ngIf="transferType === 'external' && recipientName"> to {{ recipientName }}</span>
+          <span *ngIf="transferType === 'external' && !recipientName"> to {{ recipientAccountNumber }}</span>
+          <span *ngIf="transferType === 'own'"> between your accounts</span>
+        </p>
+        <p *ngIf="note" class="text-xs text-gray-400 mt-1">"{{ note }}"</p>
+        <button (click)="close.emit()"
+          class="mt-6 w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition">
+          Done
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

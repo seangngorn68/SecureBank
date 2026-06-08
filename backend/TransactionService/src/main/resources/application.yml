@@ -1,0 +1,64 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: transaction-service
+
+  #  datasource:
+  #    url: jdbc:postgresql://localhost:5432/microdb
+  #    username: your_keycloak_admin_username
+  #    password: your_keycloak_admin_password
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/employee
+    username: postgres
+    password: your_db_password
+    driver-class-name: org.postgresql.Driver
+  cache:
+    type: redis
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    #   ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  zipkin:
+    tracing:
+    endpoint: http://localhost:9411/api/v2/spans   # Zipkin endpoint
+  tracing:
+    sampling:
+      probability: 1.0   # trace all requests (for dev/testing)
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,prometheus   # actuator endpoints for Prometheus
+
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://localhost:8181/realms/microservices-realm
+
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
+
+

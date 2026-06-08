@@ -1,0 +1,105 @@
+<header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-6 gap-4 sticky top-0 z-30">
+
+  <!-- Hamburger (mobile only) -->
+  <button (click)="toggleSidebar.emit()"
+    class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-600">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </button>
+
+  <div class="flex items-center gap-2 ml-auto">
+
+  <!-- Dark Mode Toggle -->
+  <button (click)="themeService.toggle()"
+    class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-300"
+    [title]="themeService.isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+    <svg *ngIf="!themeService.isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+    </svg>
+    <svg *ngIf="themeService.isDark" class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"/>
+    </svg>
+  </button>
+
+  <!-- Notification Bell -->
+  <div class="relative">
+    <button (click)="toggleNotifications()"
+      class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+      </svg>
+      <span *ngIf="unreadCount > 0"
+        class="absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+        {{ unreadCount > 9 ? '9+' : unreadCount }}
+      </span>
+    </button>
+
+    <!-- Dropdown -->
+    <div *ngIf="showNotifications"
+      class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+        <div class="flex items-center gap-2">
+          <h3 class="font-semibold text-gray-800">Notifications</h3>
+          <span *ngIf="unreadCount > 0"
+            class="text-xs bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded-full">
+            {{ unreadCount }} new
+          </span>
+        </div>
+        <button (click)="markAllRead()" class="text-xs text-blue-600 hover:underline">Mark all read</button>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="isLoadingNotifs" class="py-8 text-center text-gray-400 text-sm">
+        Loading...
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!isLoadingNotifs && notifications.length === 0"
+        class="py-10 text-center">
+        <p class="text-3xl mb-2">🔔</p>
+        <p class="text-sm text-gray-500 font-medium">No notifications yet</p>
+        <p class="text-xs text-gray-400 mt-1">Make a transfer to see notifications</p>
+      </div>
+
+      <!-- List -->
+      <ul *ngIf="!isLoadingNotifs && notifications.length > 0"
+        class="max-h-80 overflow-y-auto divide-y divide-gray-50">
+        <li *ngFor="let n of notifications"
+          (click)="markRead(n.id)"
+          [class]="'group flex gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition ' + (n.read ? 'opacity-60' : '')">
+          <div [class]="'w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center text-base ' + bgFor(n.type)">
+            {{ iconFor(n.type) }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <p class="text-sm font-medium text-gray-800 truncate">{{ n.title }}</p>
+              <div class="flex items-center gap-1 flex-shrink-0">
+                <span *ngIf="!n.read" class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <button (click)="deleteNotif(n.id, $event)"
+                  class="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-400 transition text-xs">✕</button>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 line-clamp-2 mt-0.5">{{ n.message }}</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ timeAgo(n.createdAt) }}</p>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Footer -->
+      <div *ngIf="notifications.length > 0"
+        class="px-4 py-3 border-t border-gray-100 text-center">
+        <p class="text-xs text-gray-400">{{ notifications.length }} notification{{ notifications.length !== 1 ? 's' : '' }} total</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Click outside overlay -->
+  <div *ngIf="showNotifications" (click)="showNotifications = false" class="fixed inset-0 z-40"></div>
+
+  </div><!-- end flex items-center ml-auto -->
+
+</header>

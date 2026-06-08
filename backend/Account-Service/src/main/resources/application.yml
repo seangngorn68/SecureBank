@@ -1,0 +1,61 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: account-service
+
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://localhost:8181/realms/microservices-realm
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/employee
+    username: postgres
+    password: your_db_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update  # change to create-drop if you want DB reset each time
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  zipkin:
+    base-url: http://localhost:9411
+    sender: web
+
+  sleuth:
+    sampler:
+      probability: 1.0   # trace every request
+
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+  metrics:
+    tags:
+      application: account-service   # ? VERY IMPORTANT for Grafana
+
+
+  logging:
+    level:
+      io.micrometer.tracing: DEBUG
+      brave: DEBUG
